@@ -1,0 +1,70 @@
+swagger: '2.0'
+info:
+  title: Parental Control Service
+  version: 1.0.0
+  contact:
+    name: Sky Service Team
+    email: serviceTeam@testsky.com
+    url: 'https://www.sky.com/help'
+  termsOfService: Parental Control Service indicate eligibility about movie watch suitability based on contro level set
+  license:
+    name: sky.com
+    url: 'https://www.sky.com/help/articles/skycom-terms-and-conditions'
+schemes:
+  - https
+host: $(catalog.host)
+basePath: /parental-control
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  '/pcl/movie/v1/watch/eligibility/{control_level}/{movie_id}':
+    get:
+      responses:
+        '200':
+          description: 200 OK
+          schema:
+           type: boolean
+        '400':
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '404':
+          description: Not Found
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+      tags:
+        - pcl
+      summary: get Control Access
+      operationId: getControlAccess
+      description: 'Indicate if customer can watch the requested movie or not based on parental control level set'
+      parameters:
+        - name: control_level
+          type: string
+          required: true
+          in: path
+          description: set control level
+        - name: movie_id
+          type: string
+          required: true
+          in: path
+          description: movie id of desired movie
+definitions:
+  ErrorResponse:
+    properties:
+      code:
+        type: string
+        description: error code
+      message:
+        type: string
+        description: error code message
+    additionalProperties: false
+    required:
+        - code
+        - message
+tags: []

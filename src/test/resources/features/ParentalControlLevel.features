@@ -1,0 +1,16 @@
+Feature: Parental Control
+
+  Scenario: Parental Control level
+
+    Given I am customer who have set parental control level PG
+    When I request to watch equal level movie M1234
+    Then I get decision to watch
+
+    Given I am customer who have set parental control level 12
+    When I request to watch higher level movie M1818
+    Then I get decision not to watch
+
+  Scenario: Parental Control level Error
+    Given I am customer who have set parental control level 12
+    When I request to watch anonymous level movie MM100Z
+    Then I get error the movie service could not find the given movie
