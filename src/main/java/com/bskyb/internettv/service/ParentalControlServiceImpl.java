@@ -1,15 +1,15 @@
 package com.bskyb.internettv.service;
 
+import com.bskyb.internettv.common.ParentalLevelCode;
 import com.bskyb.internettv.third.party.MovieService;
 import com.bskyb.internettv.third.party.TechnicalFailureException;
 import com.bskyb.internettv.third.party.TitleNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import java.util.HashMap;
-
-import static java.lang.Integer.parseInt;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -24,30 +24,33 @@ public class ParentalControlServiceImpl implements ParentalControlService {
 
     @Override
     public boolean canWatchMovie(String customerParentalControlLevel, String movieId) throws Exception {
-        HashMap<String, Integer> parentalControlLevelMap = getParentalControlLevelListMap();
+        Map<String, Integer> parentalControlLevelMap = ParentalLevelCode.PARENTAL_CODE_LEVEL;
         log.info("ParentalControlServiceImpl - canWatchMovie START");
         try {
             log.info("ParentalControlServiceImpl - canWatchMovie invoke movieService getParentalControlLevel");
-            return parseInt(parentalControlLevelMap.get(movieService.getParentalControlLevel(movieId)).toString()) <=
-                    parseInt(parentalControlLevelMap.get(customerParentalControlLevel).toString());
+            Integer movieParentalControlLevel = parentalControlLevelMap.get(movieService.getParentalControlLevel(movieId));
+            Integer customerProvidedParentalControlLevel = parentalControlLevelMap.get(customerParentalControlLevel);
 
+            if (containsValidParentalLevelCodes(movieParentalControlLevel, customerProvidedParentalControlLevel)) {
+                log.info("ParentalControlServiceImpl - canWatchMovie status");
+                return movieParentalControlLevel <= customerProvidedParentalControlLevel;
+            } else {
+                return false;
+            }
         } catch (TechnicalFailureException tfe) {
             log.info("ParentalControlServiceImpl - canWatchMovie TechnicalFailureException :{}", tfe.getMessage());
             return false;
         } catch (TitleNotFoundException tnfe) {
+            log.info("ParentalControlServiceImpl - canWatchMovie TitleNotFoundException :{}", tnfe.getMessage());
             throw new TitleNotFoundException("The movie service could not find the given movie");
         } catch (Exception e) {
+            log.info("ParentalControlServiceImpl - canWatchMovie general Exception :{}", e.getMessage());
             throw e;
         }
     }
 
-    private HashMap<String, Integer> getParentalControlLevelListMap() {
-        HashMap<String, Integer> parentalControlLevelMap = new HashMap<>();
-        parentalControlLevelMap.put("U", 0);
-        parentalControlLevelMap.put("PG", 1);
-        parentalControlLevelMap.put("12", 2);
-        parentalControlLevelMap.put("15", 3);
-        parentalControlLevelMap.put("18", 4);
-        return parentalControlLevelMap;
+    private boolean containsValidParentalLevelCodes(Integer movieParentalControlLevel, Integer customerProvidedParentalControlLevel) {
+        return !StringUtils.isEmpty(movieParentalControlLevel) && !StringUtils.isEmpty(customerProvidedParentalControlLevel);
     }
+
 }

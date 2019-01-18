@@ -3,4 +3,3 @@ server:
     contextPath: /parental-control
 ## Enable port server.port if you get error Address already on use for default 8080 ##
 #  port: 8081
-

@@ -52,6 +52,12 @@ public class ParentalControlServiceImplTest {
     }
 
     @Test
+    public void shouldReturnFalse_whenMovieParentalCodeLevelServiceReturnEmptyOrBlankAsCode() throws Exception {
+        Mockito.when(movieService.getParentalControlLevel(anyString())).thenReturn("");
+        assertFalse(parentalControlService.canWatchMovie(CUSTOMER_PARENTAL_LEVEL_CODE_18, TEST_MOVIE_ID));
+    }
+
+    @Test
     public void shouldReturnTrue_whenMovieParentalCodeLevelReturnAsU_andCustomerProvidedParentalCodeIsU() throws Exception {
         Mockito.when(movieService.getParentalControlLevel(anyString())).thenReturn(MOVIE_PARENTAL_LEVEL_CODE_U);
         assertTrue(parentalControlService.canWatchMovie(CUSTOMER_PARENTAL_LEVEL_CODE_U, TEST_MOVIE_ID));
